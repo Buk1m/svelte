@@ -1,5 +1,6 @@
 import { element } from './dom';
 import { raf } from './environment';
+import { is_function } from './utils';
 
 let stylesheet;
 let active = 0;
@@ -14,6 +15,17 @@ function hash(str: string) {
 	return hash >>> 0;
 }
 
+function append_style(root_node, style: HTMLStyleElement) {
+	return root_node.host ?
+		root_node.insertBefore(style, root_node.firstElementChild) :
+		root_node.head.appendChild(style);
+}
+
+function get_root_node(node) {
+	if (is_function(node.getRootNode)) return node.getRootNode();
+	return node.ownerDocument;
+}
+
 export function create_rule(node: Element & ElementCSSInlineStyle, a: number, b: number, duration: number, delay: number, ease: (t: number) => number, fn: (t: number, u: number) => string, uid: number = 0) {
 	const step = 16.666 / duration;
 	let keyframes = '{\n';
@@ -25,11 +37,11 @@ export function create_rule(node: Element & ElementCSSInlineStyle, a: number, b:
 
 	const rule = keyframes + `100% {${fn(b, 1 - b)}}\n}`;
 	const name = `__svelte_${hash(rule)}_${uid}`;
-
+	const root_node = get_root_node(node) as DocumentOrShadowRoot;
 	if (!current_rules[name]) {
 		if (!stylesheet) {
-			const style = element('style');
-			document.head.appendChild(style);
+			const style = element('style') as HTMLStyleElement;
+			append_style(root_node, style);
 			stylesheet = style.sheet;
 		}
 
