@@ -18,7 +18,7 @@ function hash(str: string) {
 function append_style(root_node, style: HTMLStyleElement) {
 	return root_node.host ?
 		root_node.insertBefore(style, root_node.firstElementChild) :
-		root_node.head.appendChild(style);
+		document.head.appendChild(style);
 }
 
 function get_root_node(node) {
@@ -40,7 +40,7 @@ export function create_rule(node: Element & ElementCSSInlineStyle, a: number, b:
 	const root_node = get_root_node(node) as DocumentOrShadowRoot;
 	if (!current_rules[name]) {
 		if (!stylesheet) {
-			const style = element('style') as HTMLStyleElement;
+			const style = element('style');
 			append_style(root_node, style);
 			stylesheet = style.sheet;
 		}
