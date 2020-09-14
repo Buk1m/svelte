@@ -47,8 +47,11 @@ class Rule {
 	constructor(node: CssNode, stylesheet, parent?: Atrule) {
 		this.node = node;
 		this.parent = parent;
-		console.log(node, node.children);
-		this.selectors = node.prelude.children.map((node: CssNode) => new Selector(node, stylesheet));
+		if (!node.selector) {
+			console.log(node, stylesheet, parent);
+		}
+
+		this.selectors = node.selector.children.map((node: CssNode) => new Selector(node, stylesheet));
 		this.declarations = node.block.children.map((node: CssNode) => new Declaration(node));
 	}
 
